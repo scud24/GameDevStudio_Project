@@ -1,4 +1,14 @@
-﻿using System.Collections;
+﻿/**
+    ITCS 4232-001 Group Project
+    BasicExplosion.cs
+    Purpose: 
+
+
+    @author Nathan Holzworth, (add your name here if you add stuff to this file)
+    @version 1.0 
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

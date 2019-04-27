@@ -1,4 +1,14 @@
-﻿using System.Collections;
+﻿/**
+    ITCS 4232-001 Group Project
+    BasicGun.cs
+    Purpose: 
+
+
+    @author Nathan Holzworth, (add your name here if you add stuff to this file)
+    @version 1.0 
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,34 +23,66 @@ public class BasicGun : MonoBehaviour
     public GameObject playerCamera;
     public GameObject cameraTarget;
     public int playerNum;
+    public bool readyToFire;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        playerNum = GetComponentInParent<PlayerCharacter>().playerNum;
+        if (GetComponentInParent<PlayerCharacter>())
+        {
+            playerNum = GetComponentInParent<PlayerCharacter>().playerNum;
+        }
+        else if (GetComponentInParent<IndependentAimPlayer>())
+        {
+            playerNum = GetComponentInParent<IndependentAimPlayer>().playerNum;
+        }
+        else
+        {
+            playerNum = -1;
+        }
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    protected void FixedUpdate()
     {
-        currentRefireWait--;
+        projectileSpawnLoc = transform.position;
+        projectileFireDir = Vector3.Normalize(cameraTarget.transform.position - projectileSpawnLoc);
+        Quaternion initialRotation = Quaternion.LookRotation(projectileFireDir);
+        transform.rotation = initialRotation;
+
+        if (currentRefireWait > 0)
+        {
+            currentRefireWait--;
+        }
+        else if(!readyToFire)
+        {
+            readyToFire = true;
+        }
     }
 
-    public void Fire()
+    public virtual void Fire()
     {
-        if (currentRefireWait <= 0)
+        if (readyToFire)
         {
-                projectileSpawnLoc = transform.position;
-                projectileFireDir = Vector3.Normalize(cameraTarget.transform.position - projectileSpawnLoc);
-                Quaternion initialRotation = Quaternion.LookRotation(projectileFireDir);
-                GameObject newProjectile = Instantiate(projectile, projectileSpawnLoc, initialRotation);
-                newProjectile.GetComponent<BasicProjectile>().projectileDir = projectileFireDir;
-                newProjectile.GetComponent<BasicProjectile>().projectileSpeed = projectileSpeed;
-                newProjectile.GetComponent<BasicProjectile>().parentPlayerNum = playerNum;
-                Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponent<Collider>());
+            projectileSpawnLoc = transform.position;
+            projectileFireDir = Vector3.Normalize(cameraTarget.transform.position - projectileSpawnLoc);
+            Quaternion initialRotation = Quaternion.LookRotation(projectileFireDir);
+            GameObject newProjectile = Instantiate(projectile, projectileSpawnLoc, initialRotation);
+            newProjectile.GetComponent<BasicProjectile>().projectileDir = projectileFireDir;
+            newProjectile.GetComponent<BasicProjectile>().projectileSpeed = projectileSpeed;
+            newProjectile.GetComponent<BasicProjectile>().parentPlayerNum = playerNum;
+            Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponent<Collider>());
+            if (GetComponentInParent<PlayerCharacter>())
+            {
                 Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponentInParent<PlayerCharacter>().coll);
-                currentRefireWait = refireWaitTime;
+            }
+            else
+            {
+                Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponentInParent<IndependentAimPlayer>().coll);
+            }
+            readyToFire = false;
+            currentRefireWait = refireWaitTime;
         }
     }
 }
