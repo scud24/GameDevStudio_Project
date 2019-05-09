@@ -104,7 +104,7 @@ public class IndependentAimPlayer : MonoBehaviour
 
     void AimHandler()
     {
-        float zAxis = Input.GetAxis("AimHorizontal");
+        float zAxis = Input.GetAxis("AimHorizontalP" + playerNum.ToString());
         if (zAxis < 0)
         {
             turnLeft = true;
@@ -135,10 +135,10 @@ public class IndependentAimPlayer : MonoBehaviour
         float distance = walkSpeed * Time.deltaTime;
 
         // Input on x ("Horizontal")
-        float hAxis = Input.GetAxis("Horizontal");
+        float hAxis = Input.GetAxis("HorizontalP" + playerNum.ToString());
 
         // Input on z ("Vertical")
-        float vAxis = Input.GetAxis("Vertical");
+        float vAxis = Input.GetAxis("VerticalP" + playerNum.ToString());
 
         walkDirCamera = new Vector2(hAxis, -vAxis);
         //Vector3 tempDir = cameraRig.transform.TransformDirection(walkDirCamera.x, 0, walkDirCamera.y);
@@ -203,7 +203,7 @@ public class IndependentAimPlayer : MonoBehaviour
     void JumpHandler()
     {
         // Jump axis
-        float jAxis = Input.GetAxis("Jump");
+        float jAxis = Input.GetAxis("JumpP" + playerNum.ToString());
 
         // Is grounded
         isGrounded = true;
@@ -279,7 +279,7 @@ public class IndependentAimPlayer : MonoBehaviour
 
     void GunHandler()
     {
-        if (Input.GetAxis("Fire1") > 0 && currentWeapon != null)
+        if (Input.GetAxis("Fire1P" + playerNum.ToString()) > 0 && currentWeapon != null)
         {
             currentWeapon.Fire();
         }
