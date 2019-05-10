@@ -29,6 +29,11 @@ public class BasicExplosion : MonoBehaviour
 
     public float radius;
     public float force;
+
+    public float baseIndirectDamage;
+    public float minIndirectDamage;
+    public float indirectDamageFalloffStart;
+    public float indirectDamageFalloffEnd;
     // Start is called before the first frame update
 
     void Awake()
@@ -38,8 +43,17 @@ public class BasicExplosion : MonoBehaviour
         foreach(Collider c in colliders)
         {
             if (c.attachedRigidbody == null) continue;
+            float targetDist = Vector3.Distance(transform.position, c.transform.position);
+            targetDist = Mathf.Clamp(targetDist, indirectDamageFalloffStart, indirectDamageFalloffEnd);
+            float distRatio = (targetDist - indirectDamageFalloffStart) / (indirectDamageFalloffEnd - indirectDamageFalloffStart);
 
-            c.attachedRigidbody.AddExplosionForce(force, transform.position, radius, 0.5f, ForceMode.Impulse);
+            float appliedForce = Mathf.Lerp(0, force, distRatio);
+            c.attachedRigidbody.AddExplosionForce(force, transform.position, radius, 0.2f, ForceMode.Impulse);
+            if(c.transform.GetComponent<PlayerStatsManager>())
+            {
+                float indirectDamage = Mathf.Lerp(minIndirectDamage, baseIndirectDamage, distRatio);
+                c.transform.GetComponent<PlayerStatsManager>().ApplyDamage(indirectDamage);
+            }
         }
     }
 

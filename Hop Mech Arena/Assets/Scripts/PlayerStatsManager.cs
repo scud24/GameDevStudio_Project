@@ -12,8 +12,13 @@ public class PlayerStatsManager : MonoBehaviour
     public float MAX_CHARGE_DELAY;
     public float chargeRate;
     public int currentLives;
-    public int currentRespawnTime;
-    public int MAX_RESPAWN_TIME;
+    public float currentRespawnTime;
+    public float MAX_RESPAWN_TIME;
+    public GameObject playerCharacter;
+    public GameObject spectateRig;
+    public GameObject rigCamera;
+    public bool isDead;
+    public int playerNum;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,7 +32,7 @@ public class PlayerStatsManager : MonoBehaviour
         {
             if(currentShields < MAX_SHIELDS)
             {
-                currentShields += chargeRate;
+                currentShields += chargeRate * Time.deltaTime;
                 if(currentShields > MAX_SHIELDS)
                 {
                     currentShields = MAX_SHIELDS;
@@ -36,12 +41,26 @@ public class PlayerStatsManager : MonoBehaviour
         }
         else
         {
-            currentShieldChargeDelay--;
+            currentShieldChargeDelay -= Time.deltaTime;
+        }
+
+
+        if (isDead)
+        {
+            if (currentRespawnTime <= 0)
+            {
+                HandleRespawn();
+            }
+            else
+            {
+                currentRespawnTime -= Time.deltaTime;
+            }
         }
     }
 
     public void ApplyDamage(float damageAmount)
     {
+        Debug.Log("Player " + playerNum + " recieves " + damageAmount + " damage");
         currentShields -= damageAmount;
         if (currentShields < 0)
         {
@@ -51,6 +70,10 @@ public class PlayerStatsManager : MonoBehaviour
             {
                 HandleDeath();
             }
+        }
+        else
+        {
+            currentShieldChargeDelay = MAX_CHARGE_DELAY;
         }
     }
 
@@ -71,14 +94,26 @@ public class PlayerStatsManager : MonoBehaviour
     public void HandleDeath()
     {
         currentLives--;
-        if (currentLives <= 0)
+
+        playerCharacter.SetActive(false);
+        spectateRig.SetActive(true);
+        rigCamera.GetComponent<CameraController>().isSpectateMode = true;
+        isDead = true;
+        if (currentLives > 0)
         {
-            //Switch to spectate mode
+            currentRespawnTime = MAX_RESPAWN_TIME;
         }
         else
         {
-            currentRespawnTime = MAX_RESPAWN_TIME;
-            //Disable player control and hide model
         }
+    }
+
+    public void HandleRespawn()
+    {
+        isDead = false;
+
+        playerCharacter.SetActive(true);
+        spectateRig.SetActive(false);
+        rigCamera.GetComponent<CameraController>().isSpectateMode = false;
     }
 }

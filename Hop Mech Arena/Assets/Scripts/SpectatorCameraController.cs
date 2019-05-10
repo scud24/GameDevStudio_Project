@@ -21,6 +21,7 @@ public class SpectatorCameraController : MonoBehaviour
     public Vector3 currentRotation;
 
     Rigidbody rgbd;
+    public int playerNum;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,12 +36,12 @@ public class SpectatorCameraController : MonoBehaviour
     void FixedUpdate()
     {
         // Input on x ("Horizontal")
-        float hAxis = Input.GetAxis("Horizontal");
+        float hAxis = Input.GetAxis("HorizontalP" + playerNum);
         // Input on z ("Vertical")
-        float vAxis = Input.GetAxis("Vertical");
-        float lookHAxis = Input.GetAxis("AimHorizontal");
-        float lookVAxis = Input.GetAxis("AimVertical");
-        float elevationAxis = Input.GetAxis("SpectateElevation");
+        float vAxis = Input.GetAxis("VerticalP" + playerNum);
+        float lookHAxis = Input.GetAxis("AimHorizontalP" + playerNum);
+        float lookVAxis = Input.GetAxis("AimVerticalP" + playerNum);
+        float elevationAxis = Input.GetAxis("SpectateElevationP" + playerNum);
 
         // Distance ( speed = distance / time --> distance = speed * time)
         float distance = moveSpeed * Time.deltaTime;

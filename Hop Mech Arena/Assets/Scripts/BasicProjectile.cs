@@ -21,15 +21,30 @@ public class BasicProjectile : MonoBehaviour
     public float projectileGravityScale=1;//Disable UseGravity if using this value
     public bool debugLoop;
     protected Rigidbody rgbd;
+    public float directHitDamage;
+    public float baseIndirectDamage;
+    public float minIndirectDamage;
+    public float indirectDamageFalloffStart;
+    public float indirectDamageFalloffEnd;
+    public float indirectDamageRadius;
+    public float explosionForce;
+
+
+    public int MAX_BOUNCES;
+    public int bouncesRemaining;
+    public int MAX_BOUNCE_COOLDOWN;
+    public int bounceCooldown;
 
     public GameObject hitEffectObject;
     public string projectileType;
 
+    
     public int parentPlayerNum;
     // Start is called before the first frame update
     void Start()
     {
         rgbd = GetComponent<Rigidbody>();
+        bouncesRemaining = MAX_BOUNCES;
     }
 
     // Update is called once per frame
@@ -37,7 +52,7 @@ public class BasicProjectile : MonoBehaviour
     {
         rgbd.AddForce(projectileGravityScale * Physics.gravity * rgbd.mass);
         Vector3 tempPos = transform.position;
-        tempPos += projectileDir * projectileSpeed;
+        tempPos += projectileDir * projectileSpeed * Time.deltaTime;
         rgbd.MovePosition(tempPos);
 
         if (timeFromStart > timeToLive)
@@ -52,14 +67,49 @@ public class BasicProjectile : MonoBehaviour
             }
         }
         timeFromStart++;
-    }
 
+        if(bounceCooldown > 0)
+        {
+            bounceCooldown--;
+        }
+    }
+    private void OnCollisionExit(Collision collision)
+    {
+        //Debug.Log("exit coll");
+    }
     private void OnCollisionEnter(Collision collision)
     {
-        if(projectileType == "Explosive")
+        //Debug.Log(collision.transform.tag);
+        if(collision.transform.tag == "Player" || (bouncesRemaining <=0 && bounceCooldown <= 0))
         {
-            Instantiate(hitEffectObject, transform.position, Quaternion.identity);
+            if (collision.transform.tag == "Player")
+            {
+                collision.transform.GetComponentInParent<PlayerStatsManager>().ApplyDamage(directHitDamage);
+            }
+            if (projectileType == "Explosive")
+            {  
+                //Create explosion effect. this object will deal the indirect damage
+                GameObject explosionEffect = Instantiate(hitEffectObject, transform.position, Quaternion.identity);
+                explosionEffect.GetComponent<BasicExplosion>().baseIndirectDamage = baseIndirectDamage;
+                explosionEffect.GetComponent<BasicExplosion>().minIndirectDamage = minIndirectDamage;
+                explosionEffect.GetComponent<BasicExplosion>().indirectDamageFalloffStart = indirectDamageFalloffStart;
+                explosionEffect.GetComponent<BasicExplosion>().indirectDamageFalloffEnd = indirectDamageFalloffEnd;
+                explosionEffect.GetComponent<BasicExplosion>().force = explosionForce;
+            }
             Destroy(gameObject);
+        }
+        else
+        {
+            if (bounceCooldown <= 0)
+            {
+                //Debug.Log("Bounce! Remaining: " + bouncesRemaining);
+                bouncesRemaining--;
+                bounceCooldown = MAX_BOUNCE_COOLDOWN;
+            }
+            else
+            {
+                //Debug.Log("ON cooldown");
+            }
         }
     }
 }

@@ -154,7 +154,7 @@ public class IndependentAimPlayer : MonoBehaviour
             if (!instantRotation)
             {
                 float angleDist = Mathf.DeltaAngle(tempRotation.y, walkAngle);
-                Debug.Log(angleDist);
+                //Debug.Log(angleDist);
                 if(angleDist > turnSpeed)
                 {
                     tempRotation.y += turnSpeed;
