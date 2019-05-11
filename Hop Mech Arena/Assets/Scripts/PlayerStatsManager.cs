@@ -19,10 +19,13 @@ public class PlayerStatsManager : MonoBehaviour
     public GameObject rigCamera;
     public bool isDead;
     public int playerNum;
+    public HealthBar healthBarUI;
+    public HealthBar shieldBarUI;
     // Start is called before the first frame update
     void Start()
     {
-        
+        healthBarUI.maxValue = MAX_HEALTH;
+        shieldBarUI.maxValue = MAX_SHIELDS;
     }
 
     // Update is called once per frame
@@ -30,7 +33,7 @@ public class PlayerStatsManager : MonoBehaviour
     {
         if(currentShieldChargeDelay <= 0)
         {
-            if(currentShields < MAX_SHIELDS)
+            if(currentShields < MAX_SHIELDS && !isDead)
             {
                 currentShields += chargeRate * Time.deltaTime;
                 if(currentShields > MAX_SHIELDS)
@@ -56,6 +59,8 @@ public class PlayerStatsManager : MonoBehaviour
                 currentRespawnTime -= Time.deltaTime;
             }
         }
+        healthBarUI.currentValue = currentHealth;
+        shieldBarUI.currentValue = currentShields;
     }
 
     public void ApplyDamage(float damageAmount)
@@ -115,5 +120,8 @@ public class PlayerStatsManager : MonoBehaviour
         playerCharacter.SetActive(true);
         spectateRig.SetActive(false);
         rigCamera.GetComponent<CameraController>().isSpectateMode = false;
+
+        currentHealth = MAX_HEALTH;
+        currentShields = MAX_SHIELDS;
     }
 }
