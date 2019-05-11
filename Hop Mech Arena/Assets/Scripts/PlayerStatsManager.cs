@@ -21,17 +21,28 @@ public class PlayerStatsManager : MonoBehaviour
     public int playerNum;
     public HealthBar healthBarUI;
     public HealthBar shieldBarUI;
+    public bool DEBUG_FLAG_UIAttached = true;
+    public GlobalSpawnManager spawnManager;
     // Start is called before the first frame update
     void Start()
     {
-        healthBarUI.maxValue = MAX_HEALTH;
-        shieldBarUI.maxValue = MAX_SHIELDS;
+        spawnManager = GameObject.Find("SpawnManager").GetComponent<GlobalSpawnManager>();
+        if(DEBUG_FLAG_UIAttached)
+        {
+            healthBarUI.maxValue = MAX_HEALTH;
+            shieldBarUI.maxValue = MAX_SHIELDS;
+        }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(currentShieldChargeDelay <= 0)
+
+        if (currentHealth <= 0 && !isDead)
+        {
+            HandleDeath();
+        }
+        if (currentShieldChargeDelay <= 0)
         {
             if(currentShields < MAX_SHIELDS && !isDead)
             {
@@ -59,8 +70,11 @@ public class PlayerStatsManager : MonoBehaviour
                 currentRespawnTime -= Time.deltaTime;
             }
         }
-        healthBarUI.currentValue = currentHealth;
-        shieldBarUI.currentValue = currentShields;
+        if(DEBUG_FLAG_UIAttached)
+        {
+            healthBarUI.currentValue = currentHealth;
+            shieldBarUI.currentValue = currentShields;
+        }
     }
 
     public void ApplyDamage(float damageAmount)
@@ -71,10 +85,6 @@ public class PlayerStatsManager : MonoBehaviour
         {
             currentHealth += currentShields;
             currentShields = 0;
-            if(currentHealth <= 0)
-            {
-                HandleDeath();
-            }
         }
         else
         {
@@ -118,9 +128,11 @@ public class PlayerStatsManager : MonoBehaviour
         isDead = false;
 
         playerCharacter.SetActive(true);
+        playerCharacter.transform.rotation = Quaternion.identity;
+        playerCharacter.transform.position = spawnManager.GetAvailibleSpawnpoint(playerNum);
         spectateRig.SetActive(false);
         rigCamera.GetComponent<CameraController>().isSpectateMode = false;
-
+        
         currentHealth = MAX_HEALTH;
         currentShields = MAX_SHIELDS;
     }
