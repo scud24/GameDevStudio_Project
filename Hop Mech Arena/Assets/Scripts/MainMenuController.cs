@@ -17,6 +17,10 @@ public class MainMenuController : MonoBehaviour
     {
         Debug.Log("Not Implemented Yet");
     }
+    public void ControllerTestButtonClick()
+    {
+        SceneManager.LoadScene("ControllerTestingScene");
+    }
     public void QuitButtonClick()
     {
 #if UNITY_EDITOR
