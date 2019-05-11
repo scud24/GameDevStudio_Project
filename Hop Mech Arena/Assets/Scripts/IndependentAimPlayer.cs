@@ -42,7 +42,7 @@ public class IndependentAimPlayer : MonoBehaviour
 
     //public GameObject playerCollider;
     public bool isDummy = false;
-
+    public bool isDead;
     public BasicGun currentWeapon;
     Rigidbody rgbd;
     public Collider coll;
@@ -87,7 +87,7 @@ public class IndependentAimPlayer : MonoBehaviour
         {
             stunTimeRemaining--;
         }
-        if (!isDummy && !stunned)
+        if (!isDummy && !stunned && !isDead)
         {
             AimHandler();
 
@@ -154,7 +154,7 @@ public class IndependentAimPlayer : MonoBehaviour
             if (!instantRotation)
             {
                 float angleDist = Mathf.DeltaAngle(tempRotation.y, walkAngle);
-                Debug.Log(angleDist);
+                //Debug.Log(angleDist);
                 if(angleDist > turnSpeed)
                 {
                     tempRotation.y += turnSpeed;

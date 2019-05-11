@@ -24,7 +24,7 @@ public class BasicGun : MonoBehaviour
     public GameObject cameraTarget;
     public int playerNum;
     public bool readyToFire;
-
+    public float aimOffset;
 
     // Start is called before the first frame update
     void Start()
@@ -66,7 +66,7 @@ public class BasicGun : MonoBehaviour
         if (readyToFire)
         {
             projectileSpawnLoc = transform.position;
-            projectileFireDir = Vector3.Normalize(cameraTarget.transform.position - projectileSpawnLoc);
+            projectileFireDir = Vector3.Normalize(cameraTarget.transform.position - projectileSpawnLoc + new Vector3(0, aimOffset, 0));
             Quaternion initialRotation = Quaternion.LookRotation(projectileFireDir);
             GameObject newProjectile = Instantiate(projectile, projectileSpawnLoc, initialRotation);
             newProjectile.GetComponent<BasicProjectile>().projectileDir = projectileFireDir;
