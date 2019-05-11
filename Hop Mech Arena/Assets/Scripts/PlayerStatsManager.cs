@@ -23,10 +23,12 @@ public class PlayerStatsManager : MonoBehaviour
     public HealthBar shieldBarUI;
     public bool DEBUG_FLAG_UIAttached = true;
     public GlobalSpawnManager spawnManager;
+    public ScoreManager scoreManager;
     // Start is called before the first frame update
     void Start()
     {
         spawnManager = GameObject.Find("SpawnManager").GetComponent<GlobalSpawnManager>();
+        scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
         if(DEBUG_FLAG_UIAttached)
         {
             healthBarUI.maxValue = MAX_HEALTH;
@@ -61,7 +63,7 @@ public class PlayerStatsManager : MonoBehaviour
 
         if (isDead)
         {
-            if (currentRespawnTime <= 0)
+            if (currentRespawnTime <= 0 && currentLives > 0)
             {
                 HandleRespawn();
             }
@@ -114,12 +116,14 @@ public class PlayerStatsManager : MonoBehaviour
         spectateRig.SetActive(true);
         rigCamera.GetComponent<CameraController>().isSpectateMode = true;
         isDead = true;
+        scoreManager.AddPlayerDeath(playerNum);
         if (currentLives > 0)
         {
             currentRespawnTime = MAX_RESPAWN_TIME;
         }
         else
         {
+            scoreManager.MarkPlayerOut(playerNum);
         }
     }
 

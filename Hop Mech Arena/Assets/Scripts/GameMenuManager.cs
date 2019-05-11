@@ -7,7 +7,7 @@ public class GameMenuManager : MonoBehaviour
 {
     public GameObject pauseMenuPanel;
     public GameObject resultsMenuPanel;
-    
+    public ResultsMenuController rmc;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +35,17 @@ public class GameMenuManager : MonoBehaviour
 
     public void DisplayResultsMenu()
     {
+        rmc.SetupResultsDisplay();
+        resultsMenuPanel.SetActive(true);
+    }
 
+    public void RematchButtonClicked()
+    {
+        SceneManager.LoadScene("SplitscreenTestScene");
+    }
+
+    public void QuitToMenuButtonClicked()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
