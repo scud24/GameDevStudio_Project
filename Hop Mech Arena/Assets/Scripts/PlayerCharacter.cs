@@ -1,4 +1,14 @@
-﻿using System.Collections;
+﻿/**
+    ITCS 4232-001 Group Project
+    PlayerCharacter.cs
+    Purpose: 
+
+
+    @author Nathan Holzworth, (add your name here if you add stuff to this file)
+    @version 1.0 
+*/
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,7 +35,7 @@ public class PlayerCharacter : MonoBehaviour {
     //public GameObject playerCollider;
     public bool isDummy = false;
 
-    public BasicGun currentWeapon;
+    public PlayerWeaponManager pwm;
     Rigidbody rgbd;
     public Collider coll;
 
@@ -34,10 +44,13 @@ public class PlayerCharacter : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        rgbd = gameObject.GetComponent<Rigidbody>();
+        if(!(rgbd = gameObject.GetComponent<Rigidbody>()))
+        {
+            rgbd = gameObject.GetComponentInChildren<Rigidbody>();
+        }
         playerVelocity = new Vector3();
         coll = playerBox.GetComponent<Collider>();
-        currentWeapon = GetComponentInChildren<BasicGun>();
+        pwm = GetComponent<PlayerWeaponManager>();
     }
 
     // Update is called once per frame
@@ -53,7 +66,7 @@ public class PlayerCharacter : MonoBehaviour {
         {
             stunTimeRemaining--;
         }
-        if (!isDummy || stunned)
+        if (!isDummy && !stunned)
         {
             // Handle player walking
             WalkHandler();
@@ -63,6 +76,10 @@ public class PlayerCharacter : MonoBehaviour {
 
             //Handle firing
             GunHandler();
+        }
+        else
+        {
+            CheckGrounded();
         }
     }
 
@@ -81,7 +98,7 @@ public class PlayerCharacter : MonoBehaviour {
         // Input on z ("Vertical")
         float vAxis = Input.GetAxis("Vertical");
 
-        float zAxis = Input.GetAxis("Turn");
+        float zAxis = Input.GetAxis("AimHorizontal");
         if (zAxis < 0)
         {
             turnLeft = true;
@@ -178,13 +195,13 @@ public class PlayerCharacter : MonoBehaviour {
         if (debugDraw)
         {
             if(grounded1) Debug.DrawLine(corner1, hit1.point, Color.green);
-            else Debug.DrawLine(corner1, corner1 + new Vector3(0, -rayDist, 0), Color.red);
+            else Debug.DrawLine(corner1, corner1 + transform.TransformDirection(new Vector3(0, -rayDist, 0)), Color.red);
             if (grounded2) Debug.DrawLine(corner2, hit2.point, Color.green);
-            else Debug.DrawLine(corner2, corner2 + new Vector3(0, -rayDist, 0), Color.red);
+            else Debug.DrawLine(corner2, corner2 + transform.TransformDirection(new Vector3(0, -rayDist, 0)), Color.red);
             if (grounded3) Debug.DrawLine(corner3, hit3.point, Color.green);
-            else Debug.DrawLine(corner3, corner3 + new Vector3(0, -rayDist, 0), Color.red);
+            else Debug.DrawLine(corner3, corner3 + transform.TransformDirection(new Vector3(0, -rayDist, 0)), Color.red);
             if (grounded4) Debug.DrawLine(corner4, hit4.point, Color.green);
-            else Debug.DrawLine(corner4, corner4 + new Vector3(0, -rayDist, 0), Color.red);
+            else Debug.DrawLine(corner4, corner4 + transform.TransformDirection(new Vector3(0, -rayDist, 0)), Color.red);
 
         }
         /*Debug.Log(grounded1 + " " + grounded2 + " " + grounded3 + " " + grounded4);
@@ -199,9 +216,9 @@ public class PlayerCharacter : MonoBehaviour {
 
     void GunHandler()
     {
-        if(Input.GetAxis("Fire1") > 0 && currentWeapon != null)
+        if(Input.GetAxis("Fire1") > 0)
         {
-            currentWeapon.Fire();
+            pwm.FireCurrentWeapon();
         }
     }
 }
