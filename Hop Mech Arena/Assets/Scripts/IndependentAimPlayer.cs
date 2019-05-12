@@ -61,6 +61,7 @@ public class IndependentAimPlayer : MonoBehaviour
     StunState playerStunState;
     MoveAbilityState playerMoveAbilityState;
 
+    public PlayerWeaponManager pwm;
     // Use this for initialization
     void Start()
     {
@@ -71,7 +72,7 @@ public class IndependentAimPlayer : MonoBehaviour
         }
         playerVelocity = new Vector3();
         coll = playerBox.GetComponent<Collider>();
-        currentWeapon = GetComponentInChildren<BasicGun>();
+        pwm = GetComponent<PlayerWeaponManager>();
     }
 
     // Update is called once per frame
@@ -146,7 +147,8 @@ public class IndependentAimPlayer : MonoBehaviour
         walkDir.x = tempDir.x;
         walkDir.y = tempDir.z;
 
-        Vector3 tempRotation = rgbd.rotation.eulerAngles;
+        Vector3 tempRotation = new Vector3();
+        tempRotation.y = rgbd.rotation.eulerAngles.y;
         //tempRotation.y += turnSpeed * zAxis;
         if(!(walkDirCamera.x == 0) || !(walkDirCamera.y == 0))
         {
@@ -279,9 +281,9 @@ public class IndependentAimPlayer : MonoBehaviour
 
     void GunHandler()
     {
-        if (Input.GetAxis("Fire1P" + playerNum.ToString()) > 0 && currentWeapon != null)
+        if (Input.GetAxis("Fire1P" + playerNum) > 0)
         {
-            currentWeapon.Fire();
+            pwm.FireCurrentWeapon();
         }
     }
 }

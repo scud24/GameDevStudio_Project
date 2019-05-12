@@ -64,6 +64,7 @@ public class BasicGun : MonoBehaviour
 
     public virtual void Fire()
     {
+        Debug.Log(name + " firing");
         if (readyToFire)
         {
             projectileSpawnLoc = transform.position;
