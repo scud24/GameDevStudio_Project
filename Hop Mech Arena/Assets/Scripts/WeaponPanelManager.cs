@@ -9,6 +9,7 @@ public class WeaponPanelManager : MonoBehaviour
     public Text weaponText;
     public List<Sprite> weaponImages;
     public List<string> weaponNames;
+    public PlayerWeaponManager pwm;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,6 +19,7 @@ public class WeaponPanelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        weaponImage.sprite = weaponImages[pwm.currentWeapon];
+        weaponText.text = weaponNames[pwm.currentWeapon];
     }
 }

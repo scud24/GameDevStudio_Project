@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerStatsManager : MonoBehaviour
 {
@@ -23,21 +24,30 @@ public class PlayerStatsManager : MonoBehaviour
     public HealthBar shieldBarUI;
     public bool DEBUG_FLAG_UIAttached = true;
     public GlobalSpawnManager spawnManager;
+    public ScoreManager scoreManager;
+    public Text livesText;
+    public int MAX_INVINCIBILITY_FRAMES = 2;
+    public int currentInvincibilityFrames;
     // Start is called before the first frame update
     void Start()
     {
         spawnManager = GameObject.Find("SpawnManager").GetComponent<GlobalSpawnManager>();
+        scoreManager = GameObject.Find("ScoreManager").GetComponent<ScoreManager>();
         if(DEBUG_FLAG_UIAttached)
         {
             healthBarUI.maxValue = MAX_HEALTH;
             shieldBarUI.maxValue = MAX_SHIELDS;
+            livesText.text = "Lives: " + currentLives;
         }
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        if(currentInvincibilityFrames > 0)
+        {
+            currentInvincibilityFrames--;
+        }
         if (currentHealth <= 0 && !isDead)
         {
             HandleDeath();
@@ -61,7 +71,7 @@ public class PlayerStatsManager : MonoBehaviour
 
         if (isDead)
         {
-            if (currentRespawnTime <= 0)
+            if (currentRespawnTime <= 0 && currentLives > 0)
             {
                 HandleRespawn();
             }
@@ -79,17 +89,22 @@ public class PlayerStatsManager : MonoBehaviour
 
     public void ApplyDamage(float damageAmount)
     {
-        Debug.Log("Player " + playerNum + " recieves " + damageAmount + " damage");
-        currentShields -= damageAmount;
-        if (currentShields < 0)
+        if(currentInvincibilityFrames <= 0)
         {
-            currentHealth += currentShields;
-            currentShields = 0;
+            Debug.Log("Player " + playerNum + " recieves " + damageAmount + " damage");
+            currentShields -= damageAmount;
+            if (currentShields < 0)
+            {
+                currentHealth += currentShields;
+                currentShields = 0;
+            }
+            else
+            {
+                currentShieldChargeDelay = MAX_CHARGE_DELAY;
+            }
+            currentInvincibilityFrames = MAX_INVINCIBILITY_FRAMES;
         }
-        else
-        {
-            currentShieldChargeDelay = MAX_CHARGE_DELAY;
-        }
+
     }
 
     public void ApplyHealing(float healingAmount)
@@ -114,12 +129,14 @@ public class PlayerStatsManager : MonoBehaviour
         spectateRig.SetActive(true);
         rigCamera.GetComponent<CameraController>().isSpectateMode = true;
         isDead = true;
+        scoreManager.AddPlayerDeath(playerNum);
         if (currentLives > 0)
         {
             currentRespawnTime = MAX_RESPAWN_TIME;
         }
         else
         {
+            scoreManager.MarkPlayerOut(playerNum);
         }
     }
 
