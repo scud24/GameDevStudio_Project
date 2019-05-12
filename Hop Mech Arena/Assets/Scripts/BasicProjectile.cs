@@ -26,7 +26,7 @@ public class BasicProjectile : MonoBehaviour
     public float minIndirectDamage;
     public float indirectDamageFalloffStart;
     public float indirectDamageFalloffEnd;
-    public float indirectDamageRadius;
+    //public float indirectDamageRadius;
     public float explosionForce;
 
 
@@ -94,7 +94,9 @@ public class BasicProjectile : MonoBehaviour
                 explosionEffect.GetComponent<BasicExplosion>().minIndirectDamage = minIndirectDamage;
                 explosionEffect.GetComponent<BasicExplosion>().indirectDamageFalloffStart = indirectDamageFalloffStart;
                 explosionEffect.GetComponent<BasicExplosion>().indirectDamageFalloffEnd = indirectDamageFalloffEnd;
+                Debug.Log("p: " +indirectDamageFalloffEnd + ", " + indirectDamageFalloffStart);
                 explosionEffect.GetComponent<BasicExplosion>().force = explosionForce;
+                explosionEffect.GetComponent<BasicExplosion>().radius = indirectDamageFalloffEnd;
             }
             Destroy(gameObject);
         }

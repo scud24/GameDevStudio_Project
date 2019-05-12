@@ -35,7 +35,7 @@ public class PlayerCharacter : MonoBehaviour {
     //public GameObject playerCollider;
     public bool isDummy = false;
 
-    public BasicGun currentWeapon;
+    public PlayerWeaponManager pwm;
     Rigidbody rgbd;
     public Collider coll;
 
@@ -50,7 +50,7 @@ public class PlayerCharacter : MonoBehaviour {
         }
         playerVelocity = new Vector3();
         coll = playerBox.GetComponent<Collider>();
-        currentWeapon = GetComponentInChildren<BasicGun>();
+        pwm = GetComponent<PlayerWeaponManager>();
     }
 
     // Update is called once per frame
@@ -216,9 +216,9 @@ public class PlayerCharacter : MonoBehaviour {
 
     void GunHandler()
     {
-        if(Input.GetAxis("Fire1") > 0 && currentWeapon != null)
+        if(Input.GetAxis("Fire1") > 0)
         {
-            currentWeapon.Fire();
+            pwm.FireCurrentWeapon();
         }
     }
 }

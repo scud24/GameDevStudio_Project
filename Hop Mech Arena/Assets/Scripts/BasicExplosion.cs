@@ -36,8 +36,9 @@ public class BasicExplosion : MonoBehaviour
     public float indirectDamageFalloffEnd;
     // Start is called before the first frame update
 
-    void Awake()
+    void Start()
     {
+        Debug.Log("Start");
         maxScale = radius * 2;
         Collider[] colliders = Physics.OverlapSphere(transform.position, radius);
         foreach(Collider c in colliders)
@@ -45,23 +46,29 @@ public class BasicExplosion : MonoBehaviour
             if (c.attachedRigidbody == null) continue;
             float targetDist = Vector3.Distance(transform.position, c.transform.position);
             targetDist = Mathf.Clamp(targetDist, indirectDamageFalloffStart, indirectDamageFalloffEnd);
+            Debug.Log(indirectDamageFalloffEnd + ", " + indirectDamageFalloffStart);
             float distRatio = (targetDist - indirectDamageFalloffStart) / (indirectDamageFalloffEnd - indirectDamageFalloffStart);
-
             float appliedForce = Mathf.Lerp(0, force, distRatio);
             c.attachedRigidbody.AddExplosionForce(force, transform.position, radius, 0.2f, ForceMode.Impulse);
-            if(c.transform.GetComponent<PlayerStatsManager>())
+            if(c.transform.GetComponentInParent<PlayerStatsManager>())
             {
+                Debug.Log("Dist Ratio: " + distRatio);
                 float indirectDamage = Mathf.Lerp(minIndirectDamage, baseIndirectDamage, distRatio);
-                c.transform.GetComponent<PlayerStatsManager>().ApplyDamage(indirectDamage);
+                Debug.Log("Indirect damage: " + indirectDamage);
+                c.transform.GetComponentInParent<PlayerStatsManager>().ApplyDamage(indirectDamage);
             }
         }
+    }
+    private void Awake()
+    {
+        Debug.Log("Awake"); 
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        scaleRate = (maxScale - minScale) / timeToLive;
-        float currentScale = Mathf.Lerp(minScale, maxScale, (timeFromStart / timeToLive));
+        scaleRate = (radius - minScale) / timeToLive;
+        float currentScale = Mathf.Lerp(minScale, radius, (timeFromStart / timeToLive));
         Vector3 tempScale = new Vector3(currentScale, currentScale, currentScale);
         transform.localScale = tempScale;
 

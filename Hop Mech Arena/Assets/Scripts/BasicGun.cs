@@ -25,7 +25,8 @@ public class BasicGun : MonoBehaviour
     public int playerNum;
     public bool readyToFire;
     public float aimOffset;
-
+    public GameObject gunModel;
+    public float angleOffsetY;
     // Start is called before the first frame update
     void Start()
     {
@@ -49,7 +50,7 @@ public class BasicGun : MonoBehaviour
         projectileSpawnLoc = transform.position;
         projectileFireDir = Vector3.Normalize(cameraTarget.transform.position - projectileSpawnLoc);
         Quaternion initialRotation = Quaternion.LookRotation(projectileFireDir);
-        transform.rotation = initialRotation;
+        gunModel.transform.rotation = initialRotation * Quaternion.AngleAxis(angleOffsetY, new Vector3(1,0,0));
 
         if (currentRefireWait > 0)
         {
@@ -63,6 +64,7 @@ public class BasicGun : MonoBehaviour
 
     public virtual void Fire()
     {
+        Debug.Log(name + " firing");
         if (readyToFire)
         {
             projectileSpawnLoc = transform.position;
@@ -72,7 +74,7 @@ public class BasicGun : MonoBehaviour
             newProjectile.GetComponent<BasicProjectile>().projectileDir = projectileFireDir;
             newProjectile.GetComponent<BasicProjectile>().projectileSpeed = projectileSpeed;
             newProjectile.GetComponent<BasicProjectile>().parentPlayerNum = playerNum;
-            Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponent<Collider>());
+            //Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponentInChildren<Collider>());
             if (GetComponentInParent<PlayerCharacter>())
             {
                 Physics.IgnoreCollision(newProjectile.GetComponent<Collider>(), GetComponentInParent<PlayerCharacter>().coll);
